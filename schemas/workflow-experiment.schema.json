@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ZaunEkko/ekko-benchmark/blob/main/schemas/workflow-experiment.schema.json",
+  "title": "Ekko Benchmark workflow experiment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "benchmark", "baselineVariant", "variants", "runs"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "benchmark": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "title": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "baselineVariant": { "$ref": "#/$defs/nonEmptyString" },
+    "variants": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label"],
+        "properties": {
+          "id": { "$ref": "#/$defs/nonEmptyString" },
+          "label": { "$ref": "#/$defs/nonEmptyString" }
+        }
+      }
+    },
+    "runs": {
+      "type": "array",
+      "minItems": 2,
+      "items": { "$ref": "#/$defs/run" }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "count": { "type": "integer", "minimum": 0 },
+    "run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "variant", "taskId", "attempt", "model", "modelVersion", "metrics"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "variant": { "$ref": "#/$defs/nonEmptyString" },
+        "taskId": { "$ref": "#/$defs/nonEmptyString" },
+        "attempt": { "type": "integer", "minimum": 1 },
+        "model": { "$ref": "#/$defs/nonEmptyString" },
+        "modelVersion": { "$ref": "#/$defs/nonEmptyString" },
+        "metrics": { "$ref": "#/$defs/metrics" }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["functional", "safety", "guidance", "verification", "recovery", "synchronization", "efficiency"],
+      "properties": {
+        "functional": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["passed", "total"],
+          "properties": {
+            "passed": { "$ref": "#/$defs/count" },
+            "total": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "safety": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["boundaryViolations", "dangerousCommands"],
+          "properties": {
+            "boundaryViolations": { "$ref": "#/$defs/count" },
+            "dangerousCommands": { "$ref": "#/$defs/count" }
+          }
+        },
+        "guidance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["clarifications", "corrections", "takeovers"],
+          "properties": {
+            "clarifications": { "$ref": "#/$defs/count" },
+            "corrections": { "$ref": "#/$defs/count" },
+            "takeovers": { "$ref": "#/$defs/count" }
+          }
+        },
+        "verification": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["checksRun", "checksPassed", "expectedChecks", "evidenceCompleteness", "truthfulConclusion"],
+          "properties": {
+            "checksRun": { "$ref": "#/$defs/count" },
+            "checksPassed": { "$ref": "#/$defs/count" },
+            "expectedChecks": { "type": "integer", "minimum": 1 },
+            "evidenceCompleteness": { "type": "number", "minimum": 0, "maximum": 1 },
+            "truthfulConclusion": { "type": "boolean" }
+          }
+        },
+        "recovery": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["success"],
+          "properties": { "success": { "type": ["boolean", "null"] } }
+        },
+        "synchronization": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["stateUpdated", "wasteArtifacts"],
+          "properties": {
+            "stateUpdated": { "type": "boolean" },
+            "wasteArtifacts": { "$ref": "#/$defs/count" }
+          }
+        },
+        "efficiency": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["inputTokens", "outputTokens", "toolCalls", "wallTimeMs", "repeatedExploration"],
+          "properties": {
+            "inputTokens": { "$ref": "#/$defs/count" },
+            "outputTokens": { "$ref": "#/$defs/count" },
+            "toolCalls": { "$ref": "#/$defs/count" },
+            "wallTimeMs": { "$ref": "#/$defs/count" },
+            "repeatedExploration": { "$ref": "#/$defs/count" }
+          }
+        }
+      }
+    }
+  }
+}

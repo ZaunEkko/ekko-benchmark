@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ZaunEkko/ekko-benchmark/blob/main/schemas/config.schema.json",
+  "title": "Ekko Benchmark configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "profile": {
+      "enum": ["personal-local-multirepo", "team-shared-repo"]
+    },
+    "minScore": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "waivers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["rule", "reason"],
+        "properties": {
+          "rule": { "type": "string", "minLength": 1 },
+          "reason": { "type": "string", "minLength": 8 }
+        }
+      }
+    }
+  }
+}

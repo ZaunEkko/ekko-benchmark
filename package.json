@@ -1,0 +1,50 @@
+{
+  "name": "@zaunekko/benchmark",
+  "version": "0.1.0",
+  "description": "Static benchmark for Coding Agent software requirement-to-delivery protocols",
+  "type": "module",
+  "bin": {
+    "ekko-benchmark": "./dist/bin.js"
+  },
+  "files": [
+    "dist/",
+    "docs/",
+    "examples/",
+    "schemas/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "prebenchmark": "npm run build --silent",
+    "benchmark": "node ./dist/bin.js",
+    "prebuild": "node -e \"const fs=require('node:fs'),path=require('node:path'),d='dist';if(fs.existsSync(d))for(const e of fs.readdirSync(d))fs.rmSync(path.join(d,e),{recursive:true,force:true})\"",
+    "build": "tsc -p tsconfig.build.json",
+    "prebuild:test": "node -e \"const fs=require('node:fs'),path=require('node:path'),d='.test-dist';if(fs.existsSync(d))for(const e of fs.readdirSync(d))fs.rmSync(path.join(d,e),{recursive:true,force:true})\"",
+    "build:test": "tsc -p tsconfig.test.json",
+    "test": "npm run build:test --silent && cd .test-dist && node --test",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "validate": "npm run check && npm test && npm run build",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm run validate"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^6.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZaunEkko/ekko-benchmark.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ZaunEkko/ekko-benchmark/issues"
+  },
+  "homepage": "https://github.com/ZaunEkko/ekko-benchmark#readme",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "private": false
+}

@@ -1,0 +1,284 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ZaunEkko/ekko-benchmark/blob/main/schemas/workflow-report.schema.json",
+  "title": "Ekko Benchmark workflow effect report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "tool",
+    "kind",
+    "benchmark",
+    "baselineVariant",
+    "variants",
+    "comparisons",
+    "runs",
+    "caveats"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "tool": { "$ref": "#/$defs/tool" },
+    "kind": { "const": "workflow-effect" },
+    "benchmark": { "$ref": "#/$defs/benchmark" },
+    "baselineVariant": { "$ref": "#/$defs/nonEmptyString" },
+    "variants": {
+      "type": "array",
+      "minItems": 2,
+      "items": { "$ref": "#/$defs/variantSummary" }
+    },
+    "comparisons": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/comparison" }
+    },
+    "runs": {
+      "type": "array",
+      "minItems": 2,
+      "items": { "$ref": "#/$defs/scoredRun" }
+    },
+    "caveats": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "const": "@zaunekko/benchmark" },
+        "version": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "benchmark": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "title": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "nullableScore": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 100
+    },
+    "deltaScore": {
+      "type": ["number", "null"],
+      "minimum": -100,
+      "maximum": 100
+    },
+    "scores": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "correctness",
+        "safety",
+        "autonomy",
+        "verification",
+        "recovery",
+        "synchronization"
+      ],
+      "properties": {
+        "correctness": { "$ref": "#/$defs/nullableScore" },
+        "safety": { "$ref": "#/$defs/nullableScore" },
+        "autonomy": { "$ref": "#/$defs/nullableScore" },
+        "verification": { "$ref": "#/$defs/nullableScore" },
+        "recovery": { "$ref": "#/$defs/nullableScore" },
+        "synchronization": { "$ref": "#/$defs/nullableScore" }
+      }
+    },
+    "deltaScores": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "correctness",
+        "safety",
+        "autonomy",
+        "verification",
+        "recovery",
+        "synchronization"
+      ],
+      "properties": {
+        "correctness": { "$ref": "#/$defs/deltaScore" },
+        "safety": { "$ref": "#/$defs/deltaScore" },
+        "autonomy": { "$ref": "#/$defs/deltaScore" },
+        "verification": { "$ref": "#/$defs/deltaScore" },
+        "recovery": { "$ref": "#/$defs/deltaScore" },
+        "synchronization": { "$ref": "#/$defs/deltaScore" }
+      }
+    },
+    "cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "inputTokens",
+        "outputTokens",
+        "totalTokens",
+        "toolCalls",
+        "wallTimeMs",
+        "repeatedExploration"
+      ],
+      "properties": {
+        "inputTokens": { "type": "number", "minimum": 0 },
+        "outputTokens": { "type": "number", "minimum": 0 },
+        "totalTokens": { "type": "number", "minimum": 0 },
+        "toolCalls": { "type": "number", "minimum": 0 },
+        "wallTimeMs": { "type": "number", "minimum": 0 },
+        "repeatedExploration": { "type": "number", "minimum": 0 }
+      }
+    },
+    "deltaCost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "inputTokens",
+        "outputTokens",
+        "totalTokens",
+        "toolCalls",
+        "wallTimeMs",
+        "repeatedExploration"
+      ],
+      "properties": {
+        "inputTokens": { "type": "number" },
+        "outputTokens": { "type": "number" },
+        "totalTokens": { "type": "number" },
+        "toolCalls": { "type": "number" },
+        "wallTimeMs": { "type": "number" },
+        "repeatedExploration": { "type": "number" }
+      }
+    },
+    "integrityFlag": {
+      "enum": ["boundary-violation", "dangerous-command", "untruthful-conclusion"]
+    },
+    "runIntegrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "flags"],
+      "properties": {
+        "status": { "enum": ["clear", "flagged"] },
+        "flags": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/integrityFlag" }
+        }
+      }
+    },
+    "variantIntegrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["flaggedRuns", "flags"],
+      "properties": {
+        "flaggedRuns": { "type": "integer", "minimum": 0 },
+        "flags": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["boundary-violation", "dangerous-command", "untruthful-conclusion"],
+          "properties": {
+            "boundary-violation": { "type": "integer", "minimum": 0 },
+            "dangerous-command": { "type": "integer", "minimum": 0 },
+            "untruthful-conclusion": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "qualitySummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mean", "standardDeviation"],
+      "properties": {
+        "mean": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "standardDeviation": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "variantSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "runs", "quality", "scores", "integrity", "cost"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "label": { "$ref": "#/$defs/nonEmptyString" },
+        "runs": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "quality": { "$ref": "#/$defs/qualitySummary" },
+        "scores": { "$ref": "#/$defs/scores" },
+        "integrity": { "$ref": "#/$defs/variantIntegrity" },
+        "cost": { "$ref": "#/$defs/cost" }
+      }
+    },
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baseline", "variant", "delta"],
+      "properties": {
+        "baseline": { "$ref": "#/$defs/nonEmptyString" },
+        "variant": { "$ref": "#/$defs/nonEmptyString" },
+        "delta": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["quality", "flaggedRuns", "scores", "cost"],
+          "properties": {
+            "quality": {
+              "type": "number",
+              "minimum": -100,
+              "maximum": 100
+            },
+            "flaggedRuns": { "type": "integer" },
+            "scores": { "$ref": "#/$defs/deltaScores" },
+            "cost": { "$ref": "#/$defs/deltaCost" }
+          }
+        }
+      }
+    },
+    "scoredRun": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "variant",
+        "taskId",
+        "attempt",
+        "model",
+        "modelVersion",
+        "quality",
+        "scores",
+        "integrity",
+        "cost"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "variant": { "$ref": "#/$defs/nonEmptyString" },
+        "taskId": { "$ref": "#/$defs/nonEmptyString" },
+        "attempt": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "model": { "$ref": "#/$defs/nonEmptyString" },
+        "modelVersion": { "$ref": "#/$defs/nonEmptyString" },
+        "quality": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "scores": { "$ref": "#/$defs/scores" },
+        "integrity": { "$ref": "#/$defs/runIntegrity" },
+        "cost": { "$ref": "#/$defs/cost" }
+      }
+    }
+  }
+}

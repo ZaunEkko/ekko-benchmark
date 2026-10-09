@@ -1,0 +1,10 @@
+{
+  "profile": "team-shared-repo",
+  "minScore": 70,
+  "waivers": [
+    {
+      "rule": "requirements.acceptance-contract",
+      "reason": "验收标准由外部需求系统统一维护并可从根入口访问"
+    }
+  ]
+}

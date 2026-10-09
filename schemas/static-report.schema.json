@@ -1,0 +1,387 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ZaunEkko/ekko-benchmark/blob/main/schemas/static-report.schema.json",
+  "title": "Ekko Benchmark static software collaboration protocol report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "tool",
+    "kind",
+    "workspace",
+    "profile",
+    "config",
+    "staticReadiness",
+    "results",
+    "improvements",
+    "reviewItems",
+    "inventory",
+    "unchecked",
+    "disclaimer"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "tool": { "$ref": "#/$defs/tool" },
+    "kind": { "const": "static-readiness" },
+    "workspace": { "$ref": "#/$defs/nonEmptyString" },
+    "profile": { "$ref": "#/$defs/profile" },
+    "config": { "$ref": "#/$defs/config" },
+    "staticReadiness": { "$ref": "#/$defs/staticReadiness" },
+    "results": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/ruleResult" }
+    },
+    "improvements": { "$ref": "#/$defs/improvementPlan" },
+    "reviewItems": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/reviewItem" }
+    },
+    "inventory": { "$ref": "#/$defs/inventory" },
+    "unchecked": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    },
+    "disclaimer": { "$ref": "#/$defs/nonEmptyString" }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "const": "@zaunekko/benchmark" },
+        "version": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "dimensionId": {
+      "enum": [
+        "intake",
+        "context",
+        "requirements",
+        "decisions",
+        "execution",
+        "synchronization",
+        "boundaries",
+        "verification",
+        "safety"
+      ]
+    },
+    "dimensions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "intake",
+        "context",
+        "requirements",
+        "decisions",
+        "execution",
+        "synchronization",
+        "boundaries",
+        "verification",
+        "safety"
+      ],
+      "properties": {
+        "intake": { "$ref": "#/$defs/dimensionWeight" },
+        "context": { "$ref": "#/$defs/dimensionWeight" },
+        "requirements": { "$ref": "#/$defs/dimensionWeight" },
+        "decisions": { "$ref": "#/$defs/dimensionWeight" },
+        "execution": { "$ref": "#/$defs/dimensionWeight" },
+        "synchronization": { "$ref": "#/$defs/dimensionWeight" },
+        "boundaries": { "$ref": "#/$defs/dimensionWeight" },
+        "verification": { "$ref": "#/$defs/dimensionWeight" },
+        "safety": { "$ref": "#/$defs/dimensionWeight" }
+      }
+    },
+    "dimensionWeight": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "description", "dimensions", "selection"],
+      "properties": {
+        "id": {
+          "enum": ["personal-local-multirepo", "team-shared-repo"]
+        },
+        "label": { "$ref": "#/$defs/nonEmptyString" },
+        "description": { "$ref": "#/$defs/nonEmptyString" },
+        "dimensions": { "$ref": "#/$defs/dimensions" },
+        "selection": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "confidence", "reason"],
+          "properties": {
+            "id": {
+              "enum": ["personal-local-multirepo", "team-shared-repo"]
+            },
+            "confidence": {
+              "enum": ["high", "low", "explicit", "configured"]
+            },
+            "reason": { "$ref": "#/$defs/nonEmptyString" }
+          }
+        }
+      }
+    },
+    "waiver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule", "reason"],
+      "properties": {
+        "rule": { "$ref": "#/$defs/nonEmptyString" },
+        "reason": {
+          "type": "string",
+          "minLength": 8
+        }
+      }
+    },
+    "config": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "minScore", "waivers"],
+      "properties": {
+        "path": {
+          "type": ["string", "null"]
+        },
+        "minScore": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "waivers": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/waiver" }
+        }
+      }
+    },
+    "dimensionScore": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["weight", "score", "applicableRules", "totalRules"],
+      "properties": {
+        "weight": { "$ref": "#/$defs/dimensionWeight" },
+        "score": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "applicableRules": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "totalRules": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "dimensionScores": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "intake",
+        "context",
+        "requirements",
+        "decisions",
+        "execution",
+        "synchronization",
+        "boundaries",
+        "verification",
+        "safety"
+      ],
+      "properties": {
+        "intake": { "$ref": "#/$defs/dimensionScore" },
+        "context": { "$ref": "#/$defs/dimensionScore" },
+        "requirements": { "$ref": "#/$defs/dimensionScore" },
+        "decisions": { "$ref": "#/$defs/dimensionScore" },
+        "execution": { "$ref": "#/$defs/dimensionScore" },
+        "synchronization": { "$ref": "#/$defs/dimensionScore" },
+        "boundaries": { "$ref": "#/$defs/dimensionScore" },
+        "verification": { "$ref": "#/$defs/dimensionScore" },
+        "safety": { "$ref": "#/$defs/dimensionScore" }
+      }
+    },
+    "staticReadiness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["score", "grade", "core", "dimensions", "deterministicCoverage"],
+      "properties": {
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "grade": {
+          "enum": ["S", "A", "B", "C", "D", "E", "F"]
+        },
+        "core": { "$ref": "#/$defs/coreAssessment" },
+        "dimensions": { "$ref": "#/$defs/dimensionScores" },
+        "deterministicCoverage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "coreAssessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "nonPassingRules"],
+      "properties": {
+        "status": {
+          "enum": ["clear", "limited", "blocked"]
+        },
+        "nonPassingRules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "status"],
+            "properties": {
+              "id": { "$ref": "#/$defs/nonEmptyString" },
+              "status": {
+                "enum": ["pass", "partial", "fail", "unknown", "not_applicable", "waived"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "line", "excerpt"],
+      "properties": {
+        "file": { "$ref": "#/$defs/nonEmptyString" },
+        "line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "excerpt": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "ruleResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "dimension",
+        "title",
+        "severity",
+        "weight",
+        "status",
+        "summary",
+        "evidence",
+        "recommendation",
+        "data"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "dimension": { "$ref": "#/$defs/dimensionId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "severity": {
+          "enum": ["error", "warning", "info"]
+        },
+        "weight": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "status": {
+          "enum": ["pass", "partial", "fail", "unknown", "not_applicable", "waived"]
+        },
+        "summary": { "$ref": "#/$defs/nonEmptyString" },
+        "evidence": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidence" }
+        },
+        "recommendation": {
+          "type": ["string", "null"]
+        },
+        "data": {
+          "type": ["object", "null"]
+        }
+      }
+    },
+    "improvementPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["potentialScore", "items"],
+      "properties": {
+        "potentialScore": { "type": "number", "minimum": 0, "maximum": 100 },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "title", "status", "kind", "gain"],
+            "properties": {
+              "id": { "$ref": "#/$defs/nonEmptyString" },
+              "title": { "$ref": "#/$defs/nonEmptyString" },
+              "status": { "enum": ["partial", "fail"] },
+              "kind": { "enum": ["defect", "core-gap", "gap"] },
+              "gain": { "type": "number", "minimum": 0, "maximum": 100 }
+            }
+          }
+        }
+      }
+    },
+    "reviewItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "summary"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "summary": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "pathList": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "inventory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "files",
+        "gitRoots",
+        "rootEntrypoints",
+        "instructionFiles",
+        "governanceFiles",
+        "policyFiles",
+        "manifests",
+        "workflows",
+        "hooks",
+        "truncated"
+      ],
+      "properties": {
+        "files": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "gitRoots": { "$ref": "#/$defs/pathList" },
+        "rootEntrypoints": { "$ref": "#/$defs/pathList" },
+        "instructionFiles": { "$ref": "#/$defs/pathList" },
+        "governanceFiles": { "$ref": "#/$defs/pathList" },
+        "policyFiles": { "$ref": "#/$defs/pathList" },
+        "manifests": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "workflows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "hooks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "truncated": { "type": "boolean" }
+      }
+    }
+  }
+}
