@@ -30,7 +30,7 @@ test("package metadata stays aligned with runtime metadata", () => {
   assert.equal(manifest.version, VERSION);
   assert.equal(manifest.license, "MIT");
   assert.match(String(manifest.description), /Coding Agent software/);
-  assert.equal(bin["ekko-benchmark"], "./dist/bin.js");
+  assert.equal(bin["ekko-benchmark"], "dist/bin.js");
   assert.equal(scripts.prebenchmark, "npm run build --silent");
   assert.equal(scripts.benchmark, "node ./dist/bin.js");
 });
