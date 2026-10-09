@@ -4,7 +4,7 @@
   "description": "Static benchmark for Coding Agent software requirement-to-delivery protocols",
   "type": "module",
   "bin": {
-    "ekko-benchmark": "./dist/bin.js"
+    "ekko-benchmark": "dist/bin.js"
   },
   "files": [
     "dist/",
