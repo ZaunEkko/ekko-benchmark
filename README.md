@@ -11,8 +11,9 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?style=flat-square&logo=typescript&logoColor=white)
 ![Runtime dependencies](https://img.shields.io/badge/runtime_dependencies-0-16A34A?style=flat-square)
 [![MIT License](https://img.shields.io/badge/license-MIT-111827?style=flat-square)](LICENSE)
+[![Claude Code plugin](https://img.shields.io/badge/Claude_Code-plugin-D97757?style=flat-square&logo=anthropic&logoColor=white)](https://github.com/ZaunEkko/claude-plugins/tree/main/plugins/ekko-collab-protocol)
 
-[快速开始](#快速开始) · [评分内容](#它在评什么) · [Agent 模式](#agent-模式) · [评分模型](#评分模型) · [项目文档](#项目文档)
+[快速开始](#快速开始) · [评分内容](#它在评什么) · [Agent 模式](#agent-模式) · [Claude Code 插件](#claude-code-插件) · [评分模型](#评分模型) · [项目文档](#项目文档)
 
 </div>
 
@@ -21,6 +22,8 @@ npx @zaunekko/benchmark
 ```
 
 一行命令，只读扫描当前软件项目，给出协作分、等级、九个维度、证据位置和改进建议。扫描过程离线、确定，不运行被测项目，也不调用外部 AI。
+
+> 用 Claude Code？装上 [`ekko-collab-protocol`](#claude-code-插件) 插件，一个命令就能初始化协作文件、打分和按优先级优化。
 
 ## 先看结果
 
@@ -139,6 +142,24 @@ CLI 不会另外调用模型，而是把静态基线、九个维度、全部规�
 Agent 语义分仍然不是一次真实开发任务的成功率。
 
 评分定稿后，Agent 会进入改进阶段：按客观错误、核心缺口、一般缺口排序给出改进建议和预计涨分。扫描器没认出的写法只作为规则反馈，不会建议你为迎合规则改写文档；授权边界这类团队约定只起草、由你决定；未经你同意不会修改文件，改完会同时报告改前改后两个分数。静态报告也会直接列出「最值得先改」。
+
+## Claude Code 插件
+
+不想自己串起扫描、复核和修改？[`ekko-collab-protocol`](https://github.com/ZaunEkko/claude-plugins/tree/main/plugins/ekko-collab-protocol) 把 Ekko Benchmark 装进 Claude Code，引擎随插件离线分发，不需要另装 npm 包：
+
+```text
+/plugin marketplace add ZaunEkko/claude-plugins
+/plugin install ekko-collab-protocol@zaunekko
+/reload-plugins
+```
+
+| 命令 | 作用 |
+| --- | --- |
+| `/ekko-collab-protocol:init` | 识别项目结构，只就团队约定提问，生成 `AGENTS.md`、当前状态、需求记录与 ADR 约定；生成结果在本基准上通过全部适用规则，并且从不覆盖已有文件 |
+| `/ekko-collab-protocol:score` | 只读地给出静态协议分与 Agent 语义分，附逐条证据 |
+| `/ekko-collab-protocol:optimize` | 按客观错误、核心缺口、一般缺口排序，只修改你选中的条目，并报告改前改后分数 |
+
+中文和英文项目都适用，还没开始写代码、只有协作文档的项目也能直接初始化。更多插件见 [ZaunEkko/claude-plugins](https://github.com/ZaunEkko/claude-plugins) 插件市场。
 
 ## 评分模型
 
